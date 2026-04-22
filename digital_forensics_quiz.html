@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Digital Forensics Technologies — Exam Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #060912;
+    --surface: #0d1320;
+    --surface2: #111927;
+    --border: #1a2540;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --correct: #34d399;
+    --wrong: #f87171;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --gold: #fbbf24;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND GRID ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 2;
+    padding: 56px 24px 48px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #0a0f1e 0%, transparent 100%);
+  }
+  header::after {
+    content: '';
+    position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(56,189,248,0.3);
+    padding: 4px 14px; border-radius: 2px;
+    margin-bottom: 20px;
+    background: rgba(56,189,248,0.05);
+  }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(24px, 4vw, 44px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    color: #f1f5f9;
+    margin-bottom: 12px;
+  }
+  h1 span { color: var(--accent); }
+  .subtitle {
+    font-size: 14px; color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    justify-content: center;
+    padding: 20px 24px;
+    position: relative; z-index: 2;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,19,32,0.8);
+    backdrop-filter: blur(8px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .stat {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 14px;
+  }
+  .stat-val { font-weight: 700; font-size: 15px; }
+  .stat-val.correct { color: var(--correct); }
+  .stat-val.wrong { color: var(--wrong); }
+  .stat-val.total { color: var(--accent); }
+  .stat-label { color: var(--muted); }
+  .progress-wrap {
+    width: 100%; max-width: 600px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 32px 16px 60px;
+    position: relative; z-index: 2;
+  }
+
+  /* ── WEEK SECTION ── */
+  .week-section { margin-bottom: 8px; }
+  .week-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 0 10px;
+    margin-bottom: 4px;
+  }
+  .week-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .week-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .week-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* ── QUESTION CARD ── */
+  .qcard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+  .qcard.answered-correct { border-color: rgba(52,211,153,0.3); }
+  .qcard.answered-wrong { border-color: rgba(248,113,113,0.25); }
+
+  .qcard-head {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 18px 20px 14px;
+  }
+  .qnum {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; color: var(--muted);
+    min-width: 28px; padding-top: 2px;
+  }
+  .qtext {
+    font-size: 14px; line-height: 1.65;
+    color: #cbd5e1; flex: 1;
+  }
+
+  /* ── OPTIONS ── */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    padding: 0 20px 16px 62px;
+  }
+  @media(max-width:560px){ .options { grid-template-columns: 1fr; } }
+
+  .opt {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.45;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .opt:hover:not(.disabled) {
+    background: rgba(56,189,248,0.06);
+    border-color: rgba(56,189,248,0.3);
+    color: #e2e8f0;
+  }
+  .opt-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    min-width: 18px; padding-top: 1px;
+  }
+  .opt.correct-ans {
+    background: rgba(52,211,153,0.08) !important;
+    border-color: rgba(52,211,153,0.5) !important;
+    color: #6ee7b7 !important;
+  }
+  .opt.correct-ans .opt-letter { color: var(--correct); }
+  .opt.wrong-ans {
+    background: rgba(248,113,113,0.07) !important;
+    border-color: rgba(248,113,113,0.35) !important;
+    color: #fca5a5 !important;
+  }
+  .opt.wrong-ans .opt-letter { color: var(--wrong); }
+  .opt.disabled { cursor: default; pointer-events: none; }
+  .opt.dimmed { opacity: 0.4; }
+
+  /* ── EXPLANATION ── */
+  .explanation {
+    margin: 0 20px 16px 62px;
+    background: rgba(56,189,248,0.04);
+    border: 1px solid rgba(56,189,248,0.15);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 11px 14px;
+    font-size: 12.5px;
+    color: #94a3b8;
+    line-height: 1.6;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .explanation.show { display: block; }
+  .explanation strong { color: var(--accent); }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ── RESULT SCREEN ── */
+  #result-screen {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(6,9,18,0.97);
+    backdrop-filter: blur(12px);
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+  }
+  #result-screen.show { display: flex; }
+  .result-ring {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    border: 4px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .result-ring::before {
+    content: '';
+    position: absolute; inset: -4px;
+    border-radius: 50%;
+    border: 4px solid transparent;
+    border-top-color: var(--correct);
+    border-right-color: var(--correct);
+    animation: spin 1s ease forwards;
+  }
+  @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(var(--deg)); } }
+  .result-score {
+    font-family: 'Syne', sans-serif;
+    font-size: 38px; font-weight: 800;
+    color: #f1f5f9;
+  }
+  .result-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px; color: var(--muted);
+  }
+  .result-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 800; color: #f1f5f9;
+    margin-bottom: 8px;
+  }
+  .result-grade {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px; letter-spacing: 2px;
+    margin-bottom: 28px;
+  }
+  .result-breakdown {
+    display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; justify-content: center;
+  }
+  .rb {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 20px;
+    font-family: 'DM Mono', monospace;
+  }
+  .rb-num { font-size: 24px; font-weight: 700; }
+  .rb-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .btn-retry {
+    background: var(--accent);
+    color: #060912;
+    border: none; border-radius: 6px;
+    padding: 13px 36px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.5px;
+    transition: opacity 0.2s;
+  }
+  .btn-retry:hover { opacity: 0.85; }
+
+  /* ── SUBMIT BUTTON ── */
+  .submit-wrap {
+    text-align: center; padding: 24px 0 0;
+    position: relative; z-index: 2;
+  }
+  .btn-submit {
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    border-radius: 6px;
+    padding: 13px 48px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; letter-spacing: 1px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-submit:hover {
+    background: var(--accent); color: #060912;
+  }
+
+  /* icon checkmark / x */
+  .icon { font-size: 13px; margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">University Exam · Digital Forensics</div>
+  <h1>Digital Forensics<br><span>Technologies</span></h1>
+  <p class="subtitle">80 Objective Questions · 12 Weeks · Select an answer to see explanation</p>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-val total" id="stat-answered">0</span><span class="stat-label">/80 answered</span></div>
+  <div class="stat"><span class="stat-val correct" id="stat-correct">0</span><span class="stat-label">correct</span></div>
+  <div class="stat"><span class="stat-val wrong" id="stat-wrong">0</span><span class="stat-label">wrong</span></div>
+  <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+</div>
+
+<main id="quiz-main"></main>
+
+<div class="submit-wrap">
+  <button class="btn-submit" onclick="submitQuiz()">Submit & See Final Score</button>
+</div>
+
+<!-- RESULT OVERLAY -->
+<div id="result-screen">
+  <div class="result-ring" id="result-ring">
+    <div class="result-score" id="res-score">0/80</div>
+    <div class="result-pct" id="res-pct">0%</div>
+  </div>
+  <div class="result-title" id="res-title">Well Done!</div>
+  <div class="result-grade" id="res-grade"></div>
+  <div class="result-breakdown">
+    <div class="rb"><div class="rb-num" id="rb-correct" style="color:var(--correct)">0</div><div class="rb-label">CORRECT</div></div>
+    <div class="rb"><div class="rb-num" id="rb-wrong" style="color:var(--wrong)">0</div><div class="rb-label">WRONG</div></div>
+    <div class="rb"><div class="rb-num" id="rb-skip" style="color:var(--gold)">0</div><div class="rb-label">UNANSWERED</div></div>
+  </div>
+  <button class="btn-retry" onclick="retryQuiz()">↺ Retry Quiz</button>
+</div>
+
+<script>
+const Q = [
+  // WEEK 1
+  { w:1, t:"Overview of Digital Forensics Technologies",
+    q:"Which of the following best defines digital forensics?",
+    o:["The process of hacking into digital systems","The scientific application of investigation and analysis techniques to gather and preserve evidence from digital devices","The encryption of digital data for secure transmission","The recovery of deleted files from hard drives only"],
+    a:1, exp:"Digital forensics is a branch of forensic science focused on identifying, acquiring, processing, analysing, and reporting on data stored electronically. It applies scientific methods to produce court-admissible evidence." },
+
+  { w:1, t:"Overview of Digital Forensics Technologies",
+    q:"Forensic readiness in an organization primarily refers to:",
+    o:["Having antivirus software installed on all machines","The ability to maximize potential use of digital evidence while minimizing investigation cost","Hiring only certified forensic examiners","Installing surveillance cameras throughout the workplace"],
+    a:1, exp:"Forensic readiness means proactively preparing an organization to collect, preserve, and use digital evidence efficiently. It includes logging policies, incident response plans, and staff training." },
+
+  { w:1, t:"Overview of Digital Forensics Technologies",
+    q:"Which of the following is NOT a standard phase in the digital forensic process?",
+    o:["Identification","Preservation","Encryption","Analysis"],
+    a:2, exp:"The standard digital forensic phases are: Identification, Preservation, Collection, Analysis, and Reporting. Encryption is a security control, not a forensic process phase." },
+
+  { w:1, t:"Overview of Digital Forensics Technologies",
+    q:"The principle ensuring digital evidence has not been altered since collection is called:",
+    o:["Non-repudiation","Integrity","Confidentiality","Availability"],
+    a:1, exp:"Integrity ensures data has not been modified. In forensics, hash values (MD5/SHA-256) are computed at collection and verified later — any change produces a different hash, proving tampering." },
+
+  { w:1, t:"Overview of Digital Forensics Technologies",
+    q:"A first responder to a digital crime scene should FIRST:",
+    o:["Begin analysing files immediately","Photograph and document the scene before touching anything","Reboot the system to collect volatile data","Copy all files to an external drive"],
+    a:1, exp:"Documentation before touching anything preserves the integrity of the scene. Photographs, notes, and sketches record the original state, which is critical for legal admissibility." },
+
+  { w:1, t:"Overview of Digital Forensics Technologies",
+    q:"Which body or standard provides widely accepted guidelines for digital forensic practice?",
+    o:["ISO/IEC 27037","RFC 2616","IEEE 802.11","PCI-DSS"],
+    a:0, exp:"ISO/IEC 27037 provides guidelines for the identification, collection, acquisition, and preservation of digital evidence, and is internationally recognised in forensic practice." },
+
+  { w:1, t:"Overview of Digital Forensics Technologies",
+    q:"Locard's Exchange Principle applied to digital forensics means:",
+    o:["Every criminal leaves a digital footprint","Digital evidence expires after 90 days","Encryption destroys all traces","Networks cannot be monitored without permission"],
+    a:0, exp:"Locard's principle states that every contact leaves a trace. In digital forensics, accessing or using a system inevitably leaves artefacts such as log entries, registry changes, or file timestamps." },
+
+  // WEEK 2
+  { w:2, t:"Digital Evidence Handling and Chain of Custody",
+    q:"Chain of custody in digital forensics refers to:",
+    o:["A blockchain used to store evidence","The documented, unbroken transfer of evidence from collection to court","The encryption method applied to digital evidence","A list of forensic tools used during investigation"],
+    a:1, exp:"Chain of custody is a chronological record showing who collected, handled, transferred, or analysed evidence. Breaks in the chain can render evidence inadmissible in court." },
+
+  { w:2, t:"Digital Evidence Handling and Chain of Custody",
+    q:"Which of the following is an example of volatile digital evidence?",
+    o:["Files stored on a USB drive","RAM contents of a running computer","Emails archived on a server","Printed documents"],
+    a:1, exp:"Volatile evidence exists only while a system is powered. RAM holds running processes, decryption keys, and network connections — all lost the moment the device is shut down. It must be captured first." },
+
+  { w:2, t:"Digital Evidence Handling and Chain of Custody",
+    q:"Write blockers are used in digital forensics to:",
+    o:["Speed up data transfer during acquisition","Prevent any write operations to the evidence drive during imaging","Encrypt evidence before storage","Block network traffic during investigation"],
+    a:1, exp:"Write blockers (hardware or software) intercept write commands sent to the evidence drive, ensuring the original media is never altered during imaging, preserving evidential integrity." },
+
+  { w:2, t:"Digital Evidence Handling and Chain of Custody",
+    q:"Which hashing algorithm is most commonly used to verify the integrity of forensic evidence?",
+    o:["Base64","MD5 or SHA-256","AES-256","RSA-2048"],
+    a:1, exp:"MD5 and SHA-256 generate fixed-length hash digests from data. If even one bit changes, the hash changes completely. Comparing original and copy hashes confirms the evidence is unaltered." },
+
+  { w:2, t:"Digital Evidence Handling and Chain of Custody",
+    q:"A chain of custody form should record:",
+    o:["Only the name of the lead investigator","Each person who handled the evidence, date, time, purpose, and signature","The suspect's personal information only","The cost of the forensic investigation"],
+    a:1, exp:"Every transfer of evidence must be documented with handler identity, date/time, reason for handling, and signature. This creates an unbroken audit trail that supports legal proceedings." },
+
+  { w:2, t:"Digital Evidence Handling and Chain of Custody",
+    q:"Which tool category is primarily used for forensic evidence acquisition?",
+    o:["Packet analysers","Forensic imaging tools","Password crackers","Port scanners"],
+    a:1, exp:"Forensic imaging tools (e.g., FTK Imager, dd, dcfldd) create bit-for-bit copies of storage media. They work with write blockers to ensure no changes are made to the original evidence." },
+
+  { w:2, t:"Digital Evidence Handling and Chain of Custody",
+    q:"Digital evidence types include all of the following EXCEPT:",
+    o:["Emails and chat logs","Network packet captures","Eyewitness testimony","File system metadata"],
+    a:2, exp:"Eyewitness testimony is testimonial evidence, not digital evidence. Digital evidence is any data stored or transmitted in binary form that can be used in court, including files, logs, and network data." },
+
+  // WEEK 3
+  { w:3, t:"Storage Media Forensics Technologies",
+    q:"The FAT file system stores file allocation information in:",
+    o:["Master File Table (MFT)","File Allocation Table","iNode structure","Registry hive"],
+    a:1, exp:"FAT (File Allocation Table) stores a map of which clusters belong to which files. When a file is 'deleted,' its FAT entry is cleared but the data clusters remain, enabling recovery." },
+
+  { w:3, t:"Storage Media Forensics Technologies",
+    q:"Which file system is native to modern Windows operating systems?",
+    o:["FAT32","EXT4","NTFS","HFS+"],
+    a:2, exp:"NTFS (New Technology File System) is the default Windows file system. It supports journaling, access control lists, alternate data streams, and the Master File Table — all forensically significant features." },
+
+  { w:3, t:"Storage Media Forensics Technologies",
+    q:"SSD forensics is more challenging than HDD forensics primarily because of:",
+    o:["Higher storage capacity","The TRIM command and wear-levelling that can overwrite deleted data","Lack of forensic tools for SSDs","SSDs cannot be imaged"],
+    a:1, exp:"TRIM automatically zeroes deleted data blocks for performance, and wear-levelling redistributes writes across cells — both can permanently destroy evidence before a forensic examiner intervenes." },
+
+  { w:3, t:"Storage Media Forensics Technologies",
+    q:"'Slack space' in digital forensics refers to:",
+    o:["Unallocated space between partitions","The unused portion at the end of a cluster after a file ends","Free space on a hard drive","Space used by the OS for virtual memory"],
+    a:1, exp:"When a file is smaller than its allocated cluster(s), leftover space contains remnants of previously deleted data. This slack space can hide or reveal evidence invisible to the OS." },
+
+  { w:3, t:"Storage Media Forensics Technologies",
+    q:"Unallocated space on a hard drive is best described as:",
+    o:["Space reserved for the operating system","Space marked available but may contain remnants of deleted files","Space used for real-time backups","Space reserved for bad sectors"],
+    a:1, exp:"Unallocated space is not assigned to any current file but may contain data from files deleted without secure wiping. File carving tools can recover files from this area using file signatures." },
+
+  { w:3, t:"Storage Media Forensics Technologies",
+    q:"In NTFS, the Master File Table (MFT) contains:",
+    o:["Only file names","Metadata for every file: name, size, timestamps, and data location","User account information","Network configuration data"],
+    a:1, exp:"Every file and directory in NTFS has at least one MFT entry. The MFT stores timestamps (MAC times), size, permissions, and pointers to data. Even after deletion the MFT entry may persist." },
+
+  { w:3, t:"Storage Media Forensics Technologies",
+    q:"Which Linux file system uses inodes to track file metadata?",
+    o:["FAT32","NTFS","EXT4","exFAT"],
+    a:2, exp:"EXT4 uses inodes (index nodes) to store file metadata including owner, permissions, and timestamps. Deleted files may leave orphan inodes behind, allowing partial forensic recovery." },
+
+  // WEEK 4
+  { w:4, t:"Disk Imaging and Data Acquisition Tools",
+    q:"Bit-by-bit (forensic) imaging creates:",
+    o:["A compressed backup of only used space","An exact sector-by-sector copy of the entire media including deleted data","A copy of only operating system files","A logical copy of visible files"],
+    a:1, exp:"Bit-by-bit imaging duplicates every sector, including deleted files, slack space, and unallocated areas. This ensures no potentially relevant data is missed in the investigation." },
+
+  { w:4, t:"Disk Imaging and Data Acquisition Tools",
+    q:"The primary difference between live and dead acquisition is:",
+    o:["Live uses write blockers; dead does not","Live captures volatile data from a running system; dead is performed on a powered-off system","Dead is done in the field; live only in a lab","Live acquisition only captures network traffic"],
+    a:1, exp:"Live acquisition preserves volatile data (RAM, running processes, network connections). Dead acquisition, performed on powered-off media, misses volatile data but is safer for disk integrity." },
+
+  { w:4, t:"Disk Imaging and Data Acquisition Tools",
+    q:"Which Linux command-line tool is commonly used for creating forensic disk images?",
+    o:["nmap","dd","netstat","ls"],
+    a:1, exp:"The 'dd' command copies data block-by-block. 'dcfldd' and 'dc3dd' are enhanced forensic versions that add hashing and logging. Example: dd if=/dev/sda of=image.img bs=512." },
+
+  { w:4, t:"Disk Imaging and Data Acquisition Tools",
+    q:"A forensic examiner verifies a disk image by:",
+    o:["Opening it in a text editor","Comparing the hash of the image to the hash of the original media","Running an antivirus scan","Checking file size only"],
+    a:1, exp:"Hash verification confirms the image is an exact duplicate. If the MD5/SHA-256 hash of the image matches the original, the copy is forensically sound and legally defensible." },
+
+  { w:4, t:"Disk Imaging and Data Acquisition Tools",
+    q:"A hardware write blocker's key advantage over a software write blocker is:",
+    o:["It is cheaper","It operates at hardware level, blocking writes regardless of OS","It works faster","It can image multiple drives simultaneously"],
+    a:1, exp:"Hardware write blockers intercept at the physical interface level before the OS can issue write commands. They are OS-independent and considered more reliable for evidential soundness." },
+
+  { w:4, t:"Disk Imaging and Data Acquisition Tools",
+    q:"The E01 file format is associated with which forensic imaging tool?",
+    o:["Autopsy","EnCase","Volatility","Wireshark"],
+    a:1, exp:"E01 (Expert Witness Format) is the native image format of Guidance Software's EnCase. It stores the bitstream image, case metadata, and an MD5 hash in a single compressed container." },
+
+  { w:4, t:"Disk Imaging and Data Acquisition Tools",
+    q:"When should a forensic investigator prefer live acquisition over dead acquisition?",
+    o:["When the suspect is not present","When volatile data or full-disk encryption would be lost upon shutdown","When the hard drive is damaged","When the device is a mobile phone"],
+    a:1, exp:"Full-disk encryption (e.g., BitLocker) means a powered-off drive is unreadable. Live acquisition captures the decrypted state while the system is running, along with RAM and active processes." },
+
+  // WEEK 5
+  { w:5, t:"File Analysis and Data Recovery Technologies",
+    q:"File carving is a technique that recovers files by:",
+    o:["Restoring files from the Recycle Bin","Searching raw data for file signatures without relying on the file system","Decrypting encrypted files","Reading metadata from the MFT only"],
+    a:1, exp:"File carving scans raw disk data for known file headers (magic bytes) and footers. It is particularly useful when the file system is corrupted, overwritten, or missing directory entries." },
+
+  { w:5, t:"File Analysis and Data Recovery Technologies",
+    q:"When a file is 'deleted' in Windows, what typically happens immediately?",
+    o:["The file data is permanently overwritten","The file is moved to the Recycle Bin and directory entry is updated","The file is encrypted and hidden","The file is compressed into a temp folder"],
+    a:1, exp:"Standard deletion moves the file to the Recycle Bin; the original location's directory entry is updated. Data is not erased until the space is overwritten, making recovery straightforward until that point." },
+
+  { w:5, t:"File Analysis and Data Recovery Technologies",
+    q:"Which metadata type is most useful for establishing a timeline of file activity?",
+    o:["File size","MAC times (Modified, Accessed, Created timestamps)","File permissions","File owner username"],
+    a:1, exp:"MAC timestamps record when a file was created, last modified, and last accessed. Timeline analysis using MAC times helps reconstruct the sequence of events in an investigation." },
+
+  { w:5, t:"File Analysis and Data Recovery Technologies",
+    q:"A JPEG file's magic bytes (file header signature) are:",
+    o:["89 50 4E 47","FF D8 FF","50 4B 03 04","25 50 44 46"],
+    a:1, exp:"JPEG files begin with FF D8 FF. PNG files start with 89 50 4E 47; ZIP/DOCX/XLSX begin with 50 4B 03 04; PDFs start with 25 50 44 46 (%PDF). These signatures are used in file carving." },
+
+  { w:5, t:"File Analysis and Data Recovery Technologies",
+    q:"Metadata analysis in a forensic investigation can reveal:",
+    o:["The content of encrypted files","Author, creation date, GPS coordinates, and device used","Network passwords","Browser history"],
+    a:1, exp:"Document metadata (EXIF, Office properties) can expose the author's name, editing history, GPS location of photos, device make/model — powerful evidence even without viewing file content." },
+
+  { w:5, t:"File Analysis and Data Recovery Technologies",
+    q:"Which forensic tool is widely known for file carving capabilities?",
+    o:["Wireshark","Scalpel / Foremost","Nessus","Metasploit"],
+    a:1, exp:"Scalpel and Foremost are open-source file carving tools that scan disk images for file headers and recover files by type. They are frequently used when directory structures are damaged." },
+
+  { w:5, t:"File Analysis and Data Recovery Technologies",
+    q:"Timestamp manipulation (timestomping) is a technique used to:",
+    o:["Speed up file transfers","Falsify file timestamps to hide or disguise malicious activity","Encrypt file metadata","Compress archived files"],
+    a:1, exp:"Timestomping alters MAC timestamps to mislead investigators about when a file was created or accessed. It is a common anti-forensic technique detectable through log correlation and MFT analysis." },
+
+  // WEEK 6
+  { w:6, t:"Operating System Forensics Technologies",
+    q:"The Windows Registry is forensically significant because it contains:",
+    o:["Encrypted user files","System configuration, user activity, and recently accessed file information","Only network logs","Copies of all deleted files"],
+    a:1, exp:"The Windows Registry is a hierarchical database storing OS settings, user preferences, installed software, USB connection history, recently opened files (MRU lists), and auto-run entries — all valuable to investigators." },
+
+  { w:6, t:"Operating System Forensics Technologies",
+    q:"Which Registry hive contains information about recently used files for a specific user?",
+    o:["HKEY_LOCAL_MACHINE","HKEY_CURRENT_USER (NTUSER.DAT)","HKEY_CLASSES_ROOT","HKEY_CURRENT_CONFIG"],
+    a:1, exp:"NTUSER.DAT stores per-user settings including MRU (Most Recently Used) lists, typed URLs, recent documents, and UserAssist data that shows executed programs and timestamps." },
+
+  { w:6, t:"Operating System Forensics Technologies",
+    q:"In Linux forensics, which file contains hashed user passwords?",
+    o:["/etc/shadow","/etc/passwd","/var/log/auth.log","/proc/users"],
+    a:0, exp:"/etc/shadow stores hashed passwords with salt and aging information, readable only by root. /etc/passwd holds account names but no passwords in modern systems. Both are forensically relevant." },
+
+  { w:6, t:"Operating System Forensics Technologies",
+    q:"Windows Event Logs use which file extension in modern Windows versions?",
+    o:[".log",".evtx",".txt",".reg"],
+    a:1, exp:"Modern Windows uses .evtx (XML-based Event Log format) stored in C:\\Windows\\System32\\winevt\\Logs\\. Key logs include Security (logins), System (errors), and Application events." },
+
+  { w:6, t:"Operating System Forensics Technologies",
+    q:"Windows Prefetch files are forensically useful because they show:",
+    o:["Deleted file contents","Evidence of program execution, run count, and last execution time","Network connection logs","Browser history"],
+    a:1, exp:"Prefetch files (.pf) in C:\\Windows\\Prefetch record program execution including executable path, run count, and timestamps. They provide evidence that a program was run even if it was later deleted." },
+
+  { w:6, t:"Operating System Forensics Technologies",
+    q:"The macOS Spotlight metadata store is forensically valuable because it:",
+    o:["Stores encrypted passwords","Maintains a file metadata index that can persist after file deletion","Logs all network connections","Is a backup of the entire file system"],
+    a:1, exp:"Spotlight indexes file metadata for fast searching. Its store (.Spotlight-V100) can retain records of files that have since been deleted, providing evidence of prior file existence." },
+
+  { w:6, t:"Operating System Forensics Technologies",
+    q:"What Windows artefact records which USB devices were connected to a system?",
+    o:["Prefetch files","Registry USBSTOR key","Event Log ID 4625","LNK files"],
+    a:1, exp:"The HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\USBSTOR registry key records every USB storage device connected, including device type, serial number, and timestamps." },
+
+  // WEEK 7
+  { w:7, t:"Network Forensics Technologies",
+    q:"Which tool is the industry standard for capturing and analysing network packets?",
+    o:["Autopsy","Wireshark","FTK","Volatility"],
+    a:1, exp:"Wireshark is an open-source packet analyser that captures live traffic or analyses PCAP files. It can dissect hundreds of protocols and filter traffic to isolate specific communications." },
+
+  { w:7, t:"Network Forensics Technologies",
+    q:"A PCAP file contains:",
+    o:["Compressed system logs","Raw captured network packets","Registry hive data","Disk image metadata"],
+    a:1, exp:"PCAP (Packet Capture) files store raw network packets including headers and payloads. They can be re-analysed in Wireshark or tcpdump to reconstruct network sessions and identify malicious activity." },
+
+  { w:7, t:"Network Forensics Technologies",
+    q:"Netflow data is useful in network forensics because it provides:",
+    o:["Full packet content including payloads","Summary statistics of flows: IP addresses, ports, and byte counts","Decrypted HTTPS traffic","Physical location of network devices"],
+    a:1, exp:"NetFlow captures metadata about network conversations (source/destination IP, port, protocol, duration, bytes) without full payloads. It is efficient for detecting anomalous traffic patterns at scale." },
+
+  { w:7, t:"Network Forensics Technologies",
+    q:"An investigator notices large data transfers to an external IP at unusual hours. This most likely indicates:",
+    o:["A scheduled Windows Update","Data exfiltration or unauthorised data transfer","Normal backup activity","A DNS resolution failure"],
+    a:1, exp:"Large, scheduled-seeming transfers to unknown external IPs are a classic indicator of data exfiltration — malware or an insider threat covertly sending sensitive data to an attacker-controlled server." },
+
+  { w:7, t:"Network Forensics Technologies",
+    q:"Which network protocol is most commonly analysed when investigating DNS poisoning attacks?",
+    o:["HTTP","DNS","FTP","SMTP"],
+    a:1, exp:"DNS (Domain Name System) poisoning corrupts the DNS cache to redirect users to malicious sites. Forensic analysis of DNS query/response packets reveals spoofed responses or unexpected TTL values." },
+
+  { w:7, t:"Network Forensics Technologies",
+    q:"A SYN flood attack is identified in packet analysis by:",
+    o:["Large UDP packets with no response","Many SYN packets from varying IPs with no corresponding ACK completions","Repeated HTTP 404 errors","ARP requests flooding the network"],
+    a:1, exp:"A SYN flood sends many TCP SYN packets without completing the 3-way handshake. The server's connection table fills up, causing denial of service. Packet analysis shows half-open connections from spoofed IPs." },
+
+  { w:7, t:"Network Forensics Technologies",
+    q:"Intrusion detection in network forensics primarily involves:",
+    o:["Blocking all incoming traffic","Monitoring traffic for suspicious patterns indicating an attack","Encrypting all network communications","Resetting user passwords after a breach"],
+    a:1, exp:"Network intrusion detection (NIDS) analyses traffic in real time or from logs to identify attack signatures, anomalies, or policy violations. Tools like Snort and Zeek are commonly used." },
+
+  // WEEK 8
+  { w:8, t:"Mobile Device Forensics Technologies",
+    q:"Which extraction method provides the most comprehensive data from an Android device?",
+    o:["Logical extraction","Physical extraction","Manual extraction","Cloud extraction"],
+    a:1, exp:"Physical extraction creates a bit-for-bit image of the device's storage, capturing deleted data, slack space, and all file system areas. Logical extraction only gets allocated files accessible via the OS API." },
+
+  { w:8, t:"Mobile Device Forensics Technologies",
+    q:"A SIM card in mobile forensics can provide:",
+    o:["Full call recordings","IMSI, contact lists, SMS messages, and recent call logs","Installed application data","GPS location history"],
+    a:1, exp:"SIM cards store the IMSI (subscriber identity), MSISDN (phone number), stored contacts, SMS messages, and last-dialled numbers — useful for attribution and communication evidence." },
+
+  { w:8, t:"Mobile Device Forensics Technologies",
+    q:"Faraday bags are used in mobile device forensics to:",
+    o:["Prevent physical damage","Block RF signals to prevent remote wiping or network connectivity","Store evidence securely","Speed up data extraction"],
+    a:1, exp:"Faraday cages/bags block electromagnetic signals, isolating the device from cellular, Wi-Fi, and Bluetooth networks. This prevents remote wipe commands, network sync, or location updates that could alter evidence." },
+
+  { w:8, t:"Mobile Device Forensics Technologies",
+    q:"iOS devices present forensic challenges primarily because of:",
+    o:["Lack of logging capabilities","Strong encryption and restricted file system access without jailbreaking","No cloud backup functionality","Limited storage capacity"],
+    a:1, exp:"Apple's iOS uses hardware-fused encryption keys and sandboxes apps. Without the passcode or a jailbreak exploit, full physical extraction is nearly impossible. Apple also resists law enforcement requests." },
+
+  { w:8, t:"Mobile Device Forensics Technologies",
+    q:"Which forensic tool is widely used for both Android and iOS mobile extraction?",
+    o:["Autopsy","Cellebrite UFED","Volatility","EnCase"],
+    a:1, exp:"Cellebrite UFED (Universal Forensic Extraction Device) supports thousands of mobile device models across iOS and Android, offering logical, file system, and physical extraction methods." },
+
+  { w:8, t:"Mobile Device Forensics Technologies",
+    q:"App data on Android devices is typically stored in:",
+    o:["SIM card memory","Internal storage in /data/data/<app_package>/ directories","SD card only","Cloud servers exclusively"],
+    a:1, exp:"Each Android app has its own protected directory under /data/data/ containing databases (SQLite), shared preferences, cache, and files. Root access or physical extraction is needed to access this area." },
+
+  { w:8, t:"Mobile Device Forensics Technologies",
+    q:"The IMEI number is significant in mobile device forensics because:",
+    o:["It stores the device owner's passwords","It uniquely identifies the physical handset globally regardless of SIM card","It contains the device's GPS history","It is the encryption key for the device"],
+    a:1, exp:"IMEI (International Mobile Equipment Identity) is a unique 15-digit hardware identifier. It can link a specific handset to network connections even if the SIM card is changed — crucial for attribution." },
+
+  // WEEK 9
+  { w:9, t:"Cloud and Virtual Environment Forensics",
+    q:"The primary legal challenge in cloud forensics is:",
+    o:["Lack of forensic tools","Jurisdictional issues as data may be stored across multiple countries","Cloud data cannot be imaged","Cloud providers never cooperate with investigations"],
+    a:1, exp:"Cloud data is often distributed across data centres in multiple legal jurisdictions. This creates complex legal issues around data access, sovereignty, privacy laws (e.g., GDPR), and mutual legal assistance treaties." },
+
+  { w:9, t:"Cloud and Virtual Environment Forensics",
+    q:"In a SaaS model, the forensic investigator has:",
+    o:["Full access to the underlying infrastructure","Limited access — most data is controlled by the cloud provider","Access to the hypervisor","Physical access to the servers"],
+    a:1, exp:"In SaaS (e.g., Gmail, Salesforce), the provider manages everything. Investigators typically access only what the provider's API exposes or what is obtained through legal process such as subpoenas." },
+
+  { w:9, t:"Cloud and Virtual Environment Forensics",
+    q:"VM snapshots are forensically valuable because they:",
+    o:["Prevent data deletion","Capture the entire VM state at a specific point in time, preserving evidence","Encrypt all VM data","Automatically upload evidence to a secure server"],
+    a:1, exp:"A VM snapshot captures RAM state, disk state, and all running processes at the moment of snapshot. This is invaluable for malware analysis or preserving the state of a compromised system." },
+
+  { w:9, t:"Cloud and Virtual Environment Forensics",
+    q:"Which cloud service model gives forensic investigators the most control over evidence collection?",
+    o:["SaaS","IaaS (Infrastructure as a Service)","PaaS","FaaS"],
+    a:1, exp:"IaaS (e.g., AWS EC2, Azure VMs) gives customers control over operating systems, storage, and networking. Investigators can snapshot volumes, capture memory, and access OS-level logs directly." },
+
+  { w:9, t:"Cloud and Virtual Environment Forensics",
+    q:"Virtual machine forensics primarily involves analysing:",
+    o:["Only the physical host machine","Virtual disk images (.vmdk, .vhd) and snapshots containing evidence","Only network traffic from the VM","The hypervisor's source code"],
+    a:1, exp:"VM forensics examines virtual disk files and memory snapshots. .vmdk (VMware) and .vhd/.vhdx (Hyper-V) files can be mounted and analysed with standard forensic tools like Autopsy or FTK." },
+
+  { w:9, t:"Cloud and Virtual Environment Forensics",
+    q:"'Multi-tenancy' in cloud environments poses forensic challenges because:",
+    o:["Data is always encrypted","Evidence from one tenant may be co-located with data from other clients","Cloud logs are never available","Investigators cannot use standard forensic tools"],
+    a:1, exp:"Multi-tenancy means multiple customers share the same physical infrastructure. Isolating one tenant's data without inadvertently accessing another's is both a technical and legal challenge." },
+
+  { w:9, t:"Cloud and Virtual Environment Forensics",
+    q:"Log files provided by cloud providers are important in cloud forensics for:",
+    o:["Replacing disk images entirely","Establishing who accessed resources, from where, and when","Encrypting data during transit","Providing real-time video surveillance"],
+    a:1, exp:"Cloud audit logs (e.g., AWS CloudTrail, Azure Monitor) record API calls, resource access, and configuration changes with timestamps and user identities — essential for reconstructing attack timelines." },
+
+  // WEEK 10
+  { w:10, t:"Malware and Memory Forensics Technologies",
+    q:"Which malware type disguises itself as legitimate software to trick users into installing it?",
+    o:["Worm","Trojan Horse","Ransomware","Rootkit"],
+    a:1, exp:"A Trojan Horse appears as a legitimate program (e.g., a game, utility, or update) but carries a malicious payload. Unlike worms, Trojans do not self-replicate; they rely on social engineering for distribution." },
+
+  { w:10, t:"Malware and Memory Forensics Technologies",
+    q:"Memory forensics involves analysing:",
+    o:["Hard disk sectors","RAM contents that may contain processes, encryption keys, and malware","Log files on disk","Network traffic captures"],
+    a:1, exp:"RAM holds the live state of a running system: active processes, injected code, network connections, decryption keys, and even plain-text credentials. Memory forensics captures evidence invisible to disk analysis." },
+
+  { w:10, t:"Malware and Memory Forensics Technologies",
+    q:"Which tool is the industry standard for memory forensics analysis?",
+    o:["Wireshark","Volatility Framework","Autopsy","FTK Imager"],
+    a:1, exp:"Volatility is an open-source Python-based framework for analysing memory dumps. It can list processes, network connections, loaded DLLs, registry hives, and detect injected code or rootkits." },
+
+  { w:10, t:"Malware and Memory Forensics Technologies",
+    q:"A rootkit is particularly dangerous forensically because:",
+    o:["It spreads rapidly across networks","It hides its presence from the OS and standard forensic tools","It encrypts all user data","It deletes itself after execution"],
+    a:1, exp:"Rootkits operate at the kernel or hypervisor level, hooking OS functions to conceal processes, files, and network connections. Detecting them requires memory forensics, integrity checking, or booting from trusted media." },
+
+  { w:10, t:"Malware and Memory Forensics Technologies",
+    q:"A memory dump is best described as:",
+    o:["A crash report generated by Windows","A bit-for-bit copy of RAM contents at a specific moment","A log of all memory errors","A list of installed applications"],
+    a:1, exp:"A memory dump captures the exact contents of RAM at the time of acquisition. Tools like WinPmem, DumpIt, or dd (/dev/mem on Linux) create these images for offline analysis with Volatility." },
+
+  { w:10, t:"Malware and Memory Forensics Technologies",
+    q:"Why is memory analysis critical in investigations involving fileless malware?",
+    o:["Fileless malware only attacks SSDs","Fileless malware resides in RAM with no disk artefacts, making memory the only place to detect it","It automatically deletes memory dumps","Memory analysis is faster than disk analysis"],
+    a:1, exp:"Fileless malware (e.g., PowerShell-based attacks) executes entirely in memory using legitimate OS tools. It leaves no files on disk, making traditional antivirus and disk forensics ineffective." },
+
+  { w:10, t:"Malware and Memory Forensics Technologies",
+    q:"Which malware category encrypts victim files and demands payment for decryption?",
+    o:["Spyware","Ransomware","Adware","Keylogger"],
+    a:1, exp:"Ransomware encrypts the victim's files or entire drives and demands a ransom (usually in cryptocurrency) for the decryption key. Notable examples include WannaCry, REvil, and LockBit." },
+
+  // WEEK 11
+  { w:11, t:"Digital Forensics Tools and Automation",
+    q:"Anti-forensics techniques are used by suspects to:",
+    o:["Assist forensic investigators","Obscure, destroy, or falsify evidence to hinder investigations","Speed up the forensic process","Encrypt evidence for safe storage"],
+    a:1, exp:"Anti-forensics includes disk wiping (e.g., DBAN), timestomping, steganography, encryption, and log deletion. Recognising these techniques is essential for investigators to understand evidence gaps." },
+
+  { w:11, t:"Digital Forensics Tools and Automation",
+    q:"Autopsy is best described as:",
+    o:["A network monitoring tool","An open-source digital forensics platform with a GUI for disk image analysis","A malware sandbox","A packet capture tool"],
+    a:1, exp:"Autopsy is a free, open-source forensics platform built on The Sleuth Kit. It provides modules for timeline analysis, keyword search, hash filtering, email analysis, and web artefacts." },
+
+  { w:11, t:"Digital Forensics Tools and Automation",
+    q:"Tool validation in forensic investigations ensures that:",
+    o:["The tool is the latest version available","The tool produces accurate, repeatable, reliable results that can withstand legal scrutiny","The tool is approved by the FBI","The tool can process large files quickly"],
+    a:1, exp:"Courts require that forensic tools be validated. NIST's CFTT (Computer Forensics Tool Testing) programme tests tools against known standards and publishes reports that examiners can cite in testimony." },
+
+  { w:11, t:"Digital Forensics Tools and Automation",
+    q:"Scripting for forensic automation is most commonly performed using:",
+    o:["Assembly language","Python or PowerShell to automate repetitive forensic tasks","COBOL","HTML"],
+    a:1, exp:"Python is widely used in forensics for log parsing, artefact extraction, and custom analysis scripts. PowerShell is powerful for Windows-based investigations. Both can interface with forensic APIs and databases." },
+
+  { w:11, t:"Digital Forensics Tools and Automation",
+    q:"EnCase is a commercial forensic tool used primarily for:",
+    o:["Network traffic analysis only","Comprehensive disk forensics including imaging, analysis, and reporting","Mobile device extraction only","Password cracking"],
+    a:1, exp:"Guidance Software's EnCase provides an integrated environment for disk imaging (E01 format), keyword searching, file carving, registry analysis, email parsing, and court-ready report generation." },
+
+  { w:11, t:"Digital Forensics Tools and Automation",
+    q:"Steganography as an anti-forensics technique involves:",
+    o:["Destroying storage media physically","Hiding data within ordinary-looking files such as images or audio","Overwriting disk sectors multiple times","Flooding logs with false entries"],
+    a:1, exp:"Steganography conceals secret data inside carrier files (e.g., hiding text in the LSBs of image pixels). Forensic tools like Stegdetect can detect statistical anomalies that indicate hidden content." },
+
+  { w:11, t:"Digital Forensics Tools and Automation",
+    q:"The Forensic Toolkit (FTK) is known for its ability to:",
+    o:["Only analyse mobile devices","Perform fast indexing and searching across large evidence volumes","Capture network traffic","Create malware signatures"],
+    a:1, exp:"FTK (by AccessData/Exterro) pre-indexes all evidence during import, enabling near-instant keyword searches across gigabytes of data. It also includes email parsing, password cracking integration, and report generation." },
+
+  // WEEK 12
+  { w:12, t:"Forensic Reporting and Courtroom Presentation",
+    q:"A forensic report should be written to be understood by:",
+    o:["Only technical experts","Both technical and non-technical audiences including judges and juries","Only the investigating officer","Only the prosecution team"],
+    a:1, exp:"Forensic reports must communicate technical findings clearly to all stakeholders. Judges, lawyers, and jury members typically lack technical backgrounds, so jargon must be explained and findings stated plainly." },
+
+  { w:12, t:"Forensic Reporting and Courtroom Presentation",
+    q:"An expert witness in a digital forensics case is expected to:",
+    o:["Advocate for the prosecution","Present objective, impartial technical findings clearly to the court","Refuse to answer cross-examination questions","Testify only about personal opinions"],
+    a:1, exp:"Expert witnesses have a duty to the court, not to the party that retained them. They must present findings objectively, explain methodology, and acknowledge limitations or alternative interpretations." },
+
+  { w:12, t:"Forensic Reporting and Courtroom Presentation",
+    q:"Which section of a forensic report describes the tools and methods used during the investigation?",
+    o:["Executive Summary","Methodology","Findings","Conclusions"],
+    a:1, exp:"The Methodology section documents every tool (with version numbers), procedure, and command used. This enables peer review and allows the opposing party to challenge or replicate the forensic process." },
+
+  { w:12, t:"Forensic Reporting and Courtroom Presentation",
+    q:"Visualisation of digital evidence in court presentations serves to:",
+    o:["Replace the written forensic report","Make complex technical evidence accessible and understandable to non-technical decision-makers","Legally substitute for hash verification","Summarise only the prosecution's case"],
+    a:1, exp:"Timelines, network diagrams, and annotated screenshots translate complex technical data into intuitive visuals. Effective visualisation significantly improves a jury's comprehension of digital evidence." },
+
+  { w:12, t:"Forensic Reporting and Courtroom Presentation",
+    q:"The Daubert standard (applied in many jurisdictions) governs:",
+    o:["How evidence is physically collected","The admissibility of expert testimony and scientific evidence in court","Chain of custody documentation","The use of write blockers"],
+    a:1, exp:"Daubert requires that expert testimony be based on sufficient facts, reliable methodology, and peer-reviewed techniques. Digital forensic methods must meet this standard to be admissible in US federal courts." },
+
+  { w:12, t:"Forensic Reporting and Courtroom Presentation",
+    q:"What should a forensic examiner do if they discover evidence that is exculpatory (supports the defendant)?",
+    o:["Ignore it and focus on incriminating evidence","Include it in the report, as examiners have a duty to report all findings objectively","Delete it to simplify the report","Report it only to the defence attorney"],
+    a:1, exp:"Forensic examiners are obligated to report all findings, including exculpatory evidence. Concealing evidence is unethical, illegal, and would invalidate the entire investigation." },
+
+  { w:12, t:"Forensic Reporting and Courtroom Presentation",
+    q:"Which of the following is a key requirement of forensic report writing tools used in court proceedings?",
+    o:["They must use colour graphics","They must produce tamper-evident, reproducible reports with clear methodology documentation","They must be open-source software","They must be approved by Interpol"],
+    a:1, exp:"Court-admissible reports must be reproducible, based on validated methodology, and ideally generated by tools that embed case metadata and examiner credentials. Tamper-evident PDF generation is common practice." }
+];
+
+// ── STATE ──
+let answers = new Array(Q.length).fill(null);
+let correct = 0, wrong = 0;
+
+// ── WEEK METADATA ──
+const weekMeta = {
+  1: { label:"WK 01", color:"#38bdf8" },
+  2: { label:"WK 02", color:"#818cf8" },
+  3: { label:"WK 03", color:"#f59e0b" },
+  4: { label:"WK 04", color:"#34d399" },
+  5: { label:"WK 05", color:"#f87171" },
+  6: { label:"WK 06", color:"#f472b6" },
+  7: { label:"WK 07", color:"#2dd4bf" },
+  8: { label:"WK 08", color:"#fb923c" },
+  9: { label:"WK 09", color:"#a78bfa" },
+  10:{ label:"WK 10", color:"#86efac" },
+  11:{ label:"WK 11", color:"#67e8f9" },
+  12:{ label:"WK 12", color:"#c084fc" }
+};
+
+// ── BUILD HTML ──
+function buildQuiz() {
+  const main = document.getElementById('quiz-main');
+  const weeks = [...new Set(Q.map(q=>q.w))];
+
+  weeks.forEach(wk => {
+    const wqs = Q.map((q,i)=>({...q,idx:i})).filter(q=>q.w===wk);
+    const meta = weekMeta[wk];
+    const sec = document.createElement('div');
+    sec.className = 'week-section';
+    sec.innerHTML = `<div class="week-header">
+      <span class="week-tag" style="color:${meta.color};border-color:${meta.color}44;background:${meta.color}11">${meta.label}</span>
+      <span class="week-title">${wqs[0].t}</span>
+      <div class="week-line"></div>
+    </div>`;
+
+    wqs.forEach(q => {
+      const card = document.createElement('div');
+      card.className = 'qcard';
+      card.id = `card-${q.idx}`;
+
+      const opts = q.o.map((opt,i) => {
+        const letter = ['A','B','C','D'][i];
+        return `<button class="opt" id="opt-${q.idx}-${i}" onclick="pick(${q.idx},${i})">
+          <span class="opt-letter" style="color:${meta.color}">${letter}</span>
+          <span>${opt}</span>
+        </button>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="qcard-head">
+          <span class="qnum">Q${q.idx+1}.</span>
+          <p class="qtext">${q.q}</p>
+        </div>
+        <div class="options">${opts}</div>
+        <div class="explanation" id="exp-${q.idx}">
+          <strong>✦ Explanation:</strong> ${q.exp}
+        </div>`;
+      sec.appendChild(card);
+    });
+    main.appendChild(sec);
+  });
+}
+
+// ── PICK ANSWER ──
+function pick(qi, chosen) {
+  if (answers[qi] !== null) return; // already answered
+  answers[qi] = chosen;
+
+  const q = Q[qi];
+  const card = document.getElementById(`card-${qi}`);
+  const exp = document.getElementById(`exp-${qi}`);
+  const isCorrect = chosen === q.a;
+
+  if (isCorrect) correct++;
+  else wrong++;
+
+  // Style options
+  for (let i = 0; i < q.o.length; i++) {
+    const btn = document.getElementById(`opt-${qi}-${i}`);
+    btn.classList.add('disabled');
+    if (i === q.a) btn.classList.add('correct-ans');
+    else if (i === chosen && !isCorrect) btn.classList.add('wrong-ans');
+    else btn.classList.add('dimmed');
+  }
+
+  card.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+  exp.classList.add('show');
+  updateStats();
+}
+
+// ── STATS ──
+function updateStats() {
+  const answered = answers.filter(a=>a!==null).length;
+  document.getElementById('stat-answered').textContent = answered;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('progress-bar').style.width = (answered/Q.length*100)+'%';
+}
+
+// ── SUBMIT ──
+function submitQuiz() {
+  const answered = answers.filter(a=>a!==null).length;
+  const skipped = Q.length - answered;
+  const pct = Math.round(correct/Q.length*100);
+
+  document.getElementById('res-score').textContent = `${correct}/${Q.length}`;
+  document.getElementById('res-pct').textContent = `${pct}%`;
+  document.getElementById('rb-correct').textContent = correct;
+  document.getElementById('rb-wrong').textContent = wrong;
+  document.getElementById('rb-skip').textContent = skipped;
+
+  let grade, title;
+  if (pct>=90){grade='A — Distinction';title='Outstanding Performance!';}
+  else if(pct>=75){grade='B — Merit';title='Excellent Work!';}
+  else if(pct>=60){grade='C — Pass';title='Good Effort!';}
+  else if(pct>=50){grade='D — Marginal Pass';title='Keep Studying!';}
+  else{grade='F — Fail';title='More Revision Needed';}
+
+  document.getElementById('res-grade').textContent = grade;
+  document.getElementById('res-grade').style.color = pct>=60?'var(--correct)':'var(--wrong)';
+  document.getElementById('res-title').textContent = title;
+
+  const deg = Math.round(pct/100*360);
+  document.getElementById('result-ring').style.setProperty('--deg', deg+'deg');
+
+  document.getElementById('result-screen').classList.add('show');
+}
+
+// ── RETRY ──
+function retryQuiz() {
+  answers.fill(null);
+  correct = 0; wrong = 0;
+  document.getElementById('result-screen').classList.remove('show');
+  document.getElementById('quiz-main').innerHTML = '';
+  updateStats();
+  buildQuiz();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
